@@ -22,6 +22,8 @@ public class MastodonAPI {
                     ))
                     .build();
 
+            System.out.println("Sending request: " + request);
+
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             System.out.println(response);
             System.out.println(response.body());

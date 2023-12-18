@@ -1,16 +1,23 @@
 package de.holube.rmb;
 
 import de.holube.rmb.mastodon.MyMastodonClient;
+import de.holube.rmb.message.MessageConstructor;
+import de.holube.rmb.message.RandomLineFromFile;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Main {
+
+    private static final List<MessageConstructor> messageConstructors = new ArrayList<>();
+    static {
+        // https://github.com/michmech/lemmatization-lists/blob/master/lemmatization-en.txt
+        messageConstructors.add(new RandomLineFromFile("lemmatization-en.txt"));
+    }
 
     private static MyMastodonClient client;
 
@@ -38,7 +45,12 @@ public class Main {
     }
 
     private static void sendRandomMessage() {
-        client.sendMessage("Test");
+        MessageConstructor messageConstructor =
+                messageConstructors.get(ThreadLocalRandom.current().nextInt(messageConstructors.size()));
+        String message = messageConstructor.getMessage();
+        message = message.replace("\t", " ");
+        System.out.println("Sending message: " + message);
+        client.sendMessage(message);
     }
 
 }
